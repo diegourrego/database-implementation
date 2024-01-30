@@ -27,10 +27,11 @@ type BodyResponse struct {
 }
 
 type BodyRequestProduct struct {
-	Name  string  `json:"name"`
-	Type  string  `json:"type"`
-	Count int     `json:"quantity"`
-	Price float64 `json:"price"`
+	Name        string  `json:"name"`
+	Type        string  `json:"type"`
+	Count       int     `json:"quantity"`
+	Price       float64 `json:"price"`
+	ProductCode string  `json:"product_code"`
 }
 
 func (h *ProductDefault) GetAll() http.HandlerFunc {
@@ -108,10 +109,11 @@ func (h *ProductDefault) Save() http.HandlerFunc {
 		}
 
 		product := internal.Product{
-			Name:  requestBody.Name,
-			Type:  requestBody.Type,
-			Count: requestBody.Count,
-			Price: requestBody.Price,
+			Name:        requestBody.Name,
+			Type:        requestBody.Type,
+			Count:       requestBody.Count,
+			Price:       requestBody.Price,
+			ProductCode: requestBody.ProductCode,
 		}
 
 		if err := h.sv.Save(&product); err != nil {
