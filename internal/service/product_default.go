@@ -22,9 +22,12 @@ func (s *ProductDefault) GetOne(id int) (internal.Product, error) {
 	return product, nil
 }
 
-func (s *ProductDefault) GetAll() ([]internal.Product, error) {
-	//TODO implement me
-	panic("implement me")
+func (s *ProductDefault) GetAll() (products []internal.Product, err error) {
+	products, err = s.rp.GetAll()
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
 }
 
 func (s *ProductDefault) Store(p *internal.Product) error {

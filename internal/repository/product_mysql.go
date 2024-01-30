@@ -29,12 +29,27 @@ func (r *ProductMysql) GetOne(id int) (internal.Product, error) {
 	return product, nil
 }
 
-func (r *ProductMysql) GetAll() ([]internal.Product, error) {
-	_, err := r.db.Query("SELECT p.`id`, p.`name`, p.`type`, p.`count`, p.`price` FROM `products` AS p")
+func (r *ProductMysql) GetAll() (products []internal.Product, err error) {
+	rows, err := r.db.Query(
+		"SELECT p.`id`, p.`name`, p.`type`, p.`count`, p.`price` FROM `products` AS p")
 	if err != nil {
 		return nil, err
 	}
-	return nil, err
+	for rows.Next() {
+		var p internal.Product
+		err = rows.Scan(&p.ID, &p.Name, &p.Type, &p.Count, &p.Price)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, p)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return
 }
 
 func (r *ProductMysql) Store(p *internal.Product) error {

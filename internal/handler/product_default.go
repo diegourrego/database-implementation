@@ -25,7 +25,27 @@ type BodyResponse struct {
 
 func (h *ProductDefault) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		return
+		products, err := h.sv.GetAll()
+		if err != nil {
+			code := http.StatusInternalServerError
+			body := BodyResponse{
+				Message: "An error occurred",
+				Data:    nil,
+			}
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(code)
+			json.NewEncoder(w).Encode(body)
+			return
+		}
+
+		code := http.StatusOK
+		body := BodyResponse{
+			Message: "Products found",
+			Data:    products,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(code)
+		json.NewEncoder(w).Encode(body)
 	}
 }
 

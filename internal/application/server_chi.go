@@ -6,7 +6,6 @@ import (
 	"database_implementation/internal/repository"
 	"database_implementation/internal/service"
 	"github.com/go-chi/chi/v5"
-	"log"
 	"net/http"
 )
 
@@ -66,6 +65,5 @@ func (sc *ServerChi) Run() (err error) {
 	})
 
 	err = http.ListenAndServe(sc.addr, router)
-	log.Println("Application running")
 	return
 }
