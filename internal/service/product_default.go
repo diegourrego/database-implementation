@@ -30,9 +30,11 @@ func (s *ProductDefault) GetAll() (products []internal.Product, err error) {
 	return products, nil
 }
 
-func (s *ProductDefault) Store(p *internal.Product) error {
-	//TODO implement me
-	panic("implement me")
+func (s *ProductDefault) Save(p *internal.Product) error {
+	if err := s.rp.Save(p); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *ProductDefault) Update(p *internal.Product) (internal.Product, error) {

@@ -62,6 +62,7 @@ func (sc *ServerChi) Run() (err error) {
 	router.Route("/products", func(rt chi.Router) {
 		rt.Get("/", hd.GetAll())
 		rt.Get("/{id}", hd.GetOne())
+		rt.Post("/", hd.Save())
 	})
 
 	err = http.ListenAndServe(sc.addr, router)

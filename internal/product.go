@@ -3,7 +3,8 @@ package internal
 import "errors"
 
 var (
-	ErrProductNotFound = errors.New("product not found")
+	ErrProductNotFound   = errors.New("product not found")
+	ErrProductDuplicated = errors.New("product already exists in DB")
 )
 
 type Product struct {
@@ -17,7 +18,7 @@ type Product struct {
 type ProductRepository interface {
 	GetOne(id int) (Product, error)
 	GetAll() ([]Product, error)
-	Store(p *Product) error
+	Save(p *Product) error
 	Update(p *Product) (Product, error)
 	Delete(id int) error
 }
@@ -25,7 +26,7 @@ type ProductRepository interface {
 type ProductService interface {
 	GetOne(id int) (Product, error)
 	GetAll() ([]Product, error)
-	Store(p *Product) error
+	Save(p *Product) error
 	Update(p *Product) (Product, error)
 	Delete(id int) error
 }

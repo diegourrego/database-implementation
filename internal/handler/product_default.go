@@ -3,6 +3,9 @@ package handler
 import (
 	"database_implementation/internal"
 	"encoding/json"
+	"errors"
+	"github.com/bootcamp-go/web/request"
+	"github.com/bootcamp-go/web/response"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 	"strconv"
@@ -21,6 +24,13 @@ func NewProductDefault(sv internal.ProductService) *ProductDefault {
 type BodyResponse struct {
 	Message string `json:"message"`
 	Data    any    `json:"data"`
+}
+
+type BodyRequestProduct struct {
+	Name  string  `json:"name"`
+	Type  string  `json:"type"`
+	Count int     `json:"quantity"`
+	Price float64 `json:"price"`
 }
 
 func (h *ProductDefault) GetAll() http.HandlerFunc {
@@ -86,5 +96,38 @@ func (h *ProductDefault) GetOne() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(code)
 		json.NewEncoder(w).Encode(body)
+	}
+}
+
+func (h *ProductDefault) Save() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var requestBody BodyRequestProduct
+
+		if err := request.JSON(r, &requestBody); err != nil {
+			response.Errorf(w, http.StatusBadRequest, "Invalid body")
+		}
+
+		product := internal.Product{
+			Name:  requestBody.Name,
+			Type:  requestBody.Type,
+			Count: requestBody.Count,
+			Price: requestBody.Price,
+		}
+
+		if err := h.sv.Save(&product); err != nil {
+			switch {
+			case errors.Is(err, internal.ErrProductDuplicated):
+				response.Errorf(w, http.StatusConflict, "Product already exists")
+			default:
+				response.Errorf(w, http.StatusInternalServerError, "Internal server error")
+			}
+			return
+		}
+
+		response.JSON(w, http.StatusCreated, map[string]any{
+			"message": "Product created successfully",
+			"data":    product,
+		})
+
 	}
 }

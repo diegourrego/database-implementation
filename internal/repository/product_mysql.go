@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"database_implementation/internal"
 	"errors"
+	"github.com/go-sql-driver/mysql"
 )
 
 type ProductMysql struct {
@@ -52,9 +53,28 @@ func (r *ProductMysql) GetAll() (products []internal.Product, err error) {
 	return
 }
 
-func (r *ProductMysql) Store(p *internal.Product) error {
-	//TODO implement me
-	panic("implement me")
+func (r *ProductMysql) Save(p *internal.Product) (err error) {
+	// Debemos ejecutar la query
+	query := "INSERT INTO products (`name`, `type`, `count`, `price`) VALUES (?, ?, ?, ?)"
+	result, err := r.db.Exec(query, p.Name, p.Type, p.Count, p.Price)
+	if err != nil {
+		var mysqlErr *mysql.MySQLError
+		switch mysqlErr.Number {
+		case 1062:
+			err = internal.ErrProductDuplicated
+		default:
+			return err
+		}
+		return
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return
+	}
+
+	p.ID = int(id)
+	return
 }
 
 func (r *ProductMysql) Update(p *internal.Product) (internal.Product, error) {
